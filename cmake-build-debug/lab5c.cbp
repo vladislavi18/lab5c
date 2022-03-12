@@ -74,6 +74,12 @@
 				</MakeCommands>
 			</Target>
 		</Build>
+		<Unit filename="D:/Program Files/CLionProjects/lab5c/libs/algorithms/algorithms.c">
+			<Option target="lab5c"/>
+		</Unit>
+		<Unit filename="D:/Program Files/CLionProjects/lab5c/libs/algorithms/algorithms.h">
+			<Option target="lab5c"/>
+		</Unit>
 		<Unit filename="D:/Program Files/CLionProjects/lab5c/main.c">
 			<Option target="lab5c"/>
 		</Unit>
