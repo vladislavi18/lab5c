@@ -46,7 +46,7 @@ void checkTime(void (*sortFunc )(int *, size_t),
     static size_t runCounter = 1;
 
     // генерация последовательности
-    static int innerBuffer[100000];
+    static int innerBuffer[200000];
     generateFunc(innerBuffer, size);
     printf("Run #%zu| ", runCounter++);
     printf(" Name : %s\n", experimentName);
@@ -142,27 +142,27 @@ int digit(int n, int k, int N, int M) {
     return (n >> (N * k) & (M - 1));
 }
 
-void _radixSort(int *l, int *r, int N) {
-    int k = (32 + N - 1) / N;
+void _radixSort(int *left, int *right, int N) {
+    int roundingIntegers = (32 + N - 1) / N;
     int M = 1 << N;
-    int sz = r - l;
-    int *b = (int *) malloc(sizeof(int) * sz);
+    int size = right - left;
+    int *b = (int *) malloc(sizeof(int) * size);
     int *c = (int *) malloc(sizeof(int) * M);
-    for (int i = 0; i < k; i++) {
+    for (int i = 0; i < roundingIntegers; i++) {
         for (int j = 0; j < M; j++)
             c[j] = 0;
 
-        for (int *j = l; j < r; j++)
+        for (int *j = left; j < right; j++)
             c[digit(*j, i, N, M)]++;
 
         for (int j = 1; j < M; j++)
             c[j] += c[j - 1];
 
-        for (int *j = r - 1; j >= l; j--)
+        for (int *j = right - 1; j >= left; j--)
             b[--c[digit(*j, i, N, M)]] = *j;
 
         int cur = 0;
-        for (int *j = l; j < r; j++)
+        for (int *j = left; j < right; j++)
             *j = b[cur++];
     }
     free(b);
@@ -242,6 +242,28 @@ void heapSort(int *arr, size_t n) {
     }
 }
 
+void quicksort(int *a, size_t len) {
+    if (len < 2)
+        return;
+
+    int pivot = a[len / 2];
+
+    int i, j;
+    for (i = 0, j = len - 1;; i++, j--) {
+        while (a[i] < pivot)
+            i++;
+        while (a[j] > pivot)
+            j--;
+
+        if (i >= j)
+            break;
+
+        swap(a + i, a + j);
+    }
+
+    quicksort(a, i);
+    quicksort(a + i, len - i);
+}
 
 int cmp(const void *a, const void *b) {
     return *(const int *) a - *(const int *) b;
@@ -414,6 +436,32 @@ long long selectionSortN(int *a, size_t size) {
     return countComp;
 }
 
+long long quicksortN(int *a, size_t len) {
+    long long countComp = 0;
+    if (len < 2 && ++countComp)
+        return countComp;
+
+    int pivot = a[len / 2];
+
+    int i, j;
+    for (i = 0, j = len - 1; ++countComp; i++, j--) {
+        while (a[i] < pivot && ++countComp)
+            i++;
+        while (a[j] > pivot && ++countComp)
+            j--;
+
+        if (i >= j && ++countComp)
+            break;
+
+        swap(a + i, a + j);
+    }
+
+    countComp += quicksortN(a, i);
+    countComp += quicksortN(a + i, len - i);
+
+    return countComp;
+}
+
 void checkNComp(long long (*nComp )(int *a, size_t n),
                 void (*generateFunc)(int *, size_t),
                 size_t size, char *experimentName, char *name) {
@@ -456,26 +504,28 @@ void checkNComp(long long (*nComp )(int *a, size_t n),
 void timeExperiment() {
     // описание функций сортировки
     SortFunc sorts[] = {
-            {selectionSort, "selectionSort"},
-            {insertionSort, "insertionSort"},
-            {bubbleSort,    "bubbleSort"},
-            {combsort,      "combSort"},
-            {ShellSort,     "shellSort"},
-            {radixSort,     "radixSort"},
+//            {selectionSort, "selectionSort"},
+//            {insertionSort, "insertionSort"},
+//            {bubbleSort,    "bubbleSort"},
+//            {combsort,      "combSort"},
+//            {ShellSort,     "shellSort"},
+//            {radixSort,     "radixSort"},
             {mergeSort,     "mergeSort"},
-            {heapSort,      "heapSort"},
+//            {heapSort,      "heapSort"},
+//            {quicksort,      "quicksort"},
             // вы добавите свои сортировки
     };
     const unsigned FUNCS_N = ARRAY_SIZE (sorts);
 
     nCompSort nComps[] = {
-            {selectionSortN, "selectionSortN"},
-            {insertionSortN, "insertionSortN"},
-            {bubbleSortN,    "bubbleSortN"},
-            {combsortN,      "combSortN"},
-            {shellSortN,     "shellSortN"},
-            {mergeSortN,     "mergeSortN"},
-            {heapSortN,      "heapSortN"},
+//            {selectionSortN, "selectionSortN"},
+//            {insertionSortN, "insertionSortN"},
+//            {bubbleSortN,    "bubbleSortN"},
+//            {combsortN,      "combSortN"},
+//            {shellSortN,     "shellSortN"},
+//            {mergeSortN,     "mergeSortN"},
+//            {heapSortN,      "heapSortN"},
+//            {quicksortN,      "quicksortN"},
     };
 
     const unsigned COMPS_N = ARRAY_SIZE(nComps);
@@ -492,7 +542,7 @@ void timeExperiment() {
     const unsigned CASES_N = ARRAY_SIZE (generatingFuncs);
 
     // запись статистики в файл
-    for (size_t size = 10000; size <= 100000; size += 10000) {
+    for (size_t size = 200000; size <= 200000; size += 10000) {
         printf(" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n");
         printf(" Size : %d\n", size);
         for (int i = 0; i < FUNCS_N; i++) {
